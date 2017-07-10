@@ -15,7 +15,6 @@ buildscript {
 
 apply plugin: 'kotlin'
 apply plugin: 'kotlin-spring'
-apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 
 version = '0.0.1-SNAPSHOT'
@@ -29,14 +28,26 @@ compileTestKotlin {
 
 repositories {
 	mavenCentral()
+	maven { url 'http://repo.spring.io/snapshot' }
+	maven { url 'https://dl.bintray.com/sdeleuze/maven/' }
+	maven { url 'https://oss.jfrog.org/oss-snapshot-local' }
 }
 
 
 dependencies {
-	compile('org.springframework.boot:spring-boot-starter-web')
+	compile('org.springframework.boot:spring-boot-starter-web') {
+		exclude module: 'spring-boot-starter-validation'
+	}
+	compile('org.springframework.boot:spring-boot-starter-jdbc')
+	compile('org.springframework.boot:spring-boot-devtools')
+
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}")
 	compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+
 	compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.8.7"
-	runtime('org.postgresql:postgresql')
+
+	compile('cz.jirutka.spring:spring-data-jdbc-repository:0.6.0-SNAPSHOT')
+	compile('org.postgresql:postgresql:9.4.1208')
+
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
