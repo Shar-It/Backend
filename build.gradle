@@ -35,6 +35,7 @@ repositories {
 
 bootRun {
 	systemProperties['spring.profiles.active']=project.gradle.startParameter.systemPropertiesArgs['spring.profiles.active'];
+	systemProperties['spring.datasource.url']=project.gradle.startParameter.systemPropertiesArgs['spring.datasource.url'];
 }
 
 dependencies {
