@@ -23,7 +23,12 @@ class UserController @Autowired constructor(val repository: UserRepository) {
     @GetMapping
     @RequestMapping("/search")
     @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
-    fun searchUser(@RequestParam("query") query: String) = query
+    fun searchUser(@RequestParam("query") query: String): List<RestUser> =
+            repository.findById(query)
+                    .union(repository.findByName(query))
+                    .union(repository.findByEmail(query))
+                    .distinctBy { it.login }
+                    .map { RestUser(it.login, it.name, it.email) }
 
     @GetMapping
     fun list() = repository.findAll().map { RestUser(it.login, it.name, it.email) }

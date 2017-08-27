@@ -7,7 +7,17 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository;
 
 @Repository
-open class UserRepository : BaseJdbcRepository<AppUser, String>(mapper(), unmapper(), "\"users\"", "login")
+class UserRepository : BaseJdbcRepository<AppUser, String>(mapper(), unmapper(), "\"users\"", "login") {
+    fun findById(query: String) : List<AppUser> {
+        return findAll().filter { it.login ==  query}
+    }
+    fun findByName(query: String) : List<AppUser> {
+        return findAll().filter { it.name ==  query}
+    }
+    fun findByEmail(query: String) : List<AppUser> {
+        return findAll().filter { it.email ==  query}
+    }
+}
 
 private fun mapper() = RowMapper<AppUser> {
     rs, _ ->
