@@ -1,5 +1,6 @@
 package com.alorma.sharit.controller
 
+import com.alorma.sharit.auth.AuthenticatorProvider
 import com.alorma.sharit.domain.AppUser
 import com.alorma.sharit.domain.rest.RegisterUserRequest
 import com.alorma.sharit.domain.rest.RestUser
@@ -9,11 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
-import javax.validation.constraints.NotNull
+import javax.security.auth.message.AuthException
+import javax.servlet.http.HttpServletResponse
 
 @RestController
 @RequestMapping("/users")
-class UserController @Autowired constructor(val repository: UserRepository) {
+class UserController @Autowired constructor(val repository: UserRepository, val authProvider: AuthenticatorProvider) {
 
     @PostMapping
     @ResponseBody
@@ -29,16 +31,25 @@ class UserController @Autowired constructor(val repository: UserRepository) {
     fun searchUser(@RequestHeader(HttpHeaders.AUTHORIZATION) auth: String?,
                    @RequestParam("query") query: String): List<RestUser> {
         auth?.let {
-            return repository.findById(query)
-                    .union(repository.findByName(query))
-                    .union(repository.findByEmail(query))
-                    .distinctBy { it.login }
-                    .map { RestUser(it.login, it.name, it.email) }
+            if (authProvider.isAuthenticated(auth)) {
+                return repository.findById(query)
+                        .union(repository.findByName(query))
+                        .union(repository.findByEmail(query))
+                        .distinctBy { it.login }
+                        .map { RestUser(it.login, it.name, it.email) }
+            } else {
+                throw UnauthorizedException()
+            }
         }
 
-        throw  UnauthorizedException()
+        throw UnauthorizedException()
     }
 
     @GetMapping
     fun list() = repository.findAll().map { RestUser(it.login, it.name, it.email) }
+
+    @ExceptionHandler
+    fun handleAuthException(e: UnauthorizedException, response: HttpServletResponse) {
+        response.sendError(HttpStatus.UNAUTHORIZED.value());
+    }
 }
