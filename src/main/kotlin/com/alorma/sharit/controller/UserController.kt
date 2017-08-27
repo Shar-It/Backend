@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 class UserController @Autowired constructor(val repository: UserRepository) {
 
     @PostMapping
@@ -19,6 +19,16 @@ class UserController @Autowired constructor(val repository: UserRepository) {
         val appUser = AppUser(re.login, re.name, re.token, re.email)
         repository.insert(appUser)
     }
+
+    @GetMapping
+    @RequestMapping("/search")
+    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
+    fun searchUser(@RequestParam("query") query: String): List<RestUser> =
+            repository.findById(query)
+                    .union(repository.findByName(query))
+                    .union(repository.findByEmail(query))
+                    .distinctBy { it.login }
+                    .map { RestUser(it.login, it.name, it.email) }
 
     @GetMapping
     fun list() = repository.findAll().map { RestUser(it.login, it.name, it.email) }
