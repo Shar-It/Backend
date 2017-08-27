@@ -35,15 +35,13 @@ repositories {
 
 bootRun {
 	systemProperties['spring.profiles.active']=project.gradle.startParameter.systemPropertiesArgs['spring.profiles.active'];
-	systemProperties['spring.datasource.url']=project.gradle.startParameter.systemPropertiesArgs['spring.datasource.url'];
-	systemProperties['spring.datasource.username']=project.gradle.startParameter.systemPropertiesArgs['spring.datasource.username'];
-	systemProperties['spring.datasource.password']=project.gradle.startParameter.systemPropertiesArgs['spring.datasource.password'];
+	//systemProperties['spring.datasource.url']=project.gradle.startParameter.systemPropertiesArgs['spring.datasource.url'];
+	//systemProperties['spring.datasource.username']=project.gradle.startParameter.systemPropertiesArgs['spring.datasource.username'];
+	//systemProperties['spring.datasource.password']=project.gradle.startParameter.systemPropertiesArgs['spring.datasource.password'];
 }
 
 dependencies {
-	compile('org.springframework.boot:spring-boot-starter-web') {
-		exclude module: 'spring-boot-starter-validation'
-	}
+	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('org.springframework.boot:spring-boot-devtools')
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}")
 	compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
@@ -53,7 +51,6 @@ dependencies {
 	compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.8.7"
 
 	compile('cz.jirutka.spring:spring-data-jdbc-repository:0.6.0-SNAPSHOT')
-	compile('org.postgresql:postgresql:9.4.1208')
 
-	testCompile('org.springframework.boot:spring-boot-starter-test')
+	compile('org.postgresql:postgresql:9.4.1208')
 }
