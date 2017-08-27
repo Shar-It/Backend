@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
-import javax.security.auth.message.AuthException
 import javax.servlet.http.HttpServletResponse
 
 @RestController
@@ -46,10 +45,15 @@ class UserController @Autowired constructor(val repository: UserRepository, val 
     }
 
     @GetMapping
-    fun list() = repository.findAll().map { RestUser(it.login, it.name, it.email) }
+    fun list(@RequestHeader(HttpHeaders.AUTHORIZATION) auth: String?): List<RestUser> {
+        auth?.let {
+            if (authProvider.isAuthenticated(auth)) {
+                return repository.findAll().map { RestUser(it.login, it.name, it.email) }
+            } else {
+                throw UnauthorizedException()
+            }
+        }
 
-    @ExceptionHandler
-    fun handleAuthException(e: UnauthorizedException, response: HttpServletResponse) {
-        response.sendError(HttpStatus.UNAUTHORIZED.value());
+        throw UnauthorizedException()
     }
 }
