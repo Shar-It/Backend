@@ -8,19 +8,24 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 class UserRepository : BaseJdbcRepository<AppUser, String>(mapper(), unmapper(), "\"users\"", "login") {
-    fun findById(query: String) : List<AppUser> {
-        return findAll().filter { it.login.contains(query)}
+    fun findById(query: String): List<AppUser> {
+        return findAll().filter { it.login.contains(query) }
     }
-    fun findByName(query: String) : List<AppUser> {
-        return findAll().filter { it.name.contains(query)}
+
+    fun findByName(query: String): List<AppUser> {
+        return findAll().filter { it.name.contains(query) }
     }
-    fun findByEmail(query: String) : List<AppUser> {
-        return findAll().filter { it.email.contains(query)}
+
+    fun findByEmail(query: String): List<AppUser> {
+        return findAll().filter { it.email.contains(query) }
+    }
+
+    fun findByToken(token: String): AppUser? {
+        return findAll().find { it.token == token }
     }
 }
 
-private fun mapper() = RowMapper<AppUser> {
-    rs, _ ->
+private fun mapper() = RowMapper<AppUser> { rs, _ ->
     AppUser(
             rs.getString("login"),
             rs.getString("user_name"),
