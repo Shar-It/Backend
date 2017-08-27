@@ -1,0 +1,20 @@
+{
+  "name": "Backend",
+  "scripts": {
+  },
+  "env": {
+    "spring.profiles.active": {
+      "required": true
+    }
+  },
+  "formation": {
+  },
+  "addons": [
+    "heroku-postgresql"
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/gradle"
+    }
+  ]
+}
