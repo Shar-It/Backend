@@ -9,13 +9,13 @@ import org.springframework.stereotype.Repository;
 @Repository
 class UserRepository : BaseJdbcRepository<AppUser, String>(mapper(), unmapper(), "\"users\"", "login") {
     fun findById(query: String) : List<AppUser> {
-        return findAll().filter { it.login ==  query}
+        return findAll().filter { it.login.contains(query)}
     }
     fun findByName(query: String) : List<AppUser> {
-        return findAll().filter { it.name ==  query}
+        return findAll().filter { it.name.contains(query)}
     }
     fun findByEmail(query: String) : List<AppUser> {
-        return findAll().filter { it.email ==  query}
+        return findAll().filter { it.email.contains(query)}
     }
 }
 
