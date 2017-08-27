@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import javax.servlet.http.HttpServletResponse
 
 @RestController
 @RequestMapping("/users")
@@ -26,17 +27,17 @@ class UserController @Autowired constructor(val repository: UserRepository, val 
     @GetMapping
     @RequestMapping("/search")
     @ResponseStatus(HttpStatus.OK)
-    fun searchUser(@RequestHeader(HttpHeaders.AUTHORIZATION) auth: String?,
+    fun searchUser(@RequestHeader(HttpHeaders.AUTHORIZATION) authorizationHeader: String?,
                    @RequestParam("query") query: String): List<RestUser> {
-        auth?.let {
-            if (authProvider.isAuthenticated(auth)) {
+        authorizationHeader?.let {
+            val authUser = authProvider.getAuthUser(authorizationHeader)
+            authUser?.let {
                 return repository.findById(query)
                         .union(repository.findByName(query))
                         .union(repository.findByEmail(query))
                         .distinctBy { it.login }
+                        .filterNot { it.login == authUser.login }
                         .map { RestUser(it.login, it.name, it.email) }
-            } else {
-                throw UnauthorizedException()
             }
         }
 
@@ -46,7 +47,7 @@ class UserController @Autowired constructor(val repository: UserRepository, val 
     @GetMapping
     fun list(@RequestHeader(HttpHeaders.AUTHORIZATION) auth: String?): List<RestUser> {
         auth?.let {
-            if (authProvider.isAuthenticated(auth)) {
+            if (authProvider.getAuthUser(auth) != null) {
                 return repository.findAll().map { RestUser(it.login, it.name, it.email) }
             } else {
                 throw UnauthorizedException()
@@ -54,5 +55,10 @@ class UserController @Autowired constructor(val repository: UserRepository, val 
         }
 
         throw UnauthorizedException()
+    }
+
+    @ExceptionHandler
+    fun handleAuthException(e: UnauthorizedException, response: HttpServletResponse) {
+        response.sendError(HttpStatus.UNAUTHORIZED.value());
     }
 }
