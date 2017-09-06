@@ -9,12 +9,15 @@ import com.alorma.sharit.repository.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.social.facebook.api.Facebook
 import org.springframework.web.bind.annotation.*
 import javax.servlet.http.HttpServletResponse
 
 @RestController
 @RequestMapping("/users")
-class UserController @Autowired constructor(val repository: UserRepository, val authProvider: AuthenticatorProvider) {
+class UserController @Autowired constructor(val repository: UserRepository,
+                                            val authProvider: AuthenticatorProvider,
+                                            val facebook: Facebook) {
 
     @PostMapping
     @ResponseBody
